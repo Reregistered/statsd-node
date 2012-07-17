@@ -3,7 +3,8 @@
 
 var dgram = require('dgram');
 
-var client = exports.client = function(params){
+
+var Client = function(params){
 
   params = params || {};
 
@@ -14,12 +15,12 @@ var client = exports.client = function(params){
   // create a new class with a UDP connection
   this.client = dgram.createSocket("udp4");
 
-  return this;
+  //return this;
 
-};
+}
 
 
-client.prototype.count = function(name, count, interval){
+Client.prototype.count = function(name, count, interval){
 
   var str = name + ':' + count + '|c' + (interval ? '|@' + interval : '');
   var buf = new Buffer(str);
@@ -28,7 +29,7 @@ client.prototype.count = function(name, count, interval){
 
 };
 
-client.prototype.timing = function(name, timing){
+Client.prototype.timing = function(name, timing){
 
   var str = name + ':' + timing + '|ms';
   var buf = new Buffer(str);
@@ -37,7 +38,7 @@ client.prototype.timing = function(name, timing){
 
 };
 
-client.prototype.gauge = function(name,val){
+Client.prototype.gauge = function(name,val){
 
   var str = name + ':' + val + '|g';
   var buf = new Buffer(str);
@@ -46,8 +47,12 @@ client.prototype.gauge = function(name,val){
 
 };
 
-client.prototype.send = function(buf){
+Client.prototype.send = function(buf){
 
   this.client.send(buf, 0, buf.length, this.port, this.host);
 
+};
+
+exports = module.exports = function(params){
+  return new Client(params);
 };
