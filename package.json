@@ -1,0 +1,15 @@
+{
+    "name": "statsd-node"
+  , "version": "0.0.1"
+  , "description": "statsd node client"
+  , "keywords": ["nodejs", "statsd","client"]
+  , "repository" :
+	  { "type" : "git"
+	    , "url" : "https://github.com/Reregistered/statsd-node.git"
+	  }
+  , "author": "Dov Amihod "
+  , "dependencies": {
+  }
+  , "main": "client"
+  , "engines": { "node": ">= 0.4.0 < 0.7.0" }
+}
