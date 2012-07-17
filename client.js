@@ -7,7 +7,7 @@ var client = exports.client = function(params){
 
   params = params || {};
 
-  this.port = params.port || '';
+  this.port = params.port || '8125';
   this.host = params.host || 'localhost';
 
   ////////////////////////////////////////
