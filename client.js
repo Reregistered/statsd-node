@@ -38,9 +38,9 @@ Client.prototype.timing = function(name, timing){
 
 };
 
-Client.prototype.gauge = function(name,val){
+Client.prototype.gauge = function(name,val, incr){
 
-  var str = name + ':' + val + '|g';
+  var str = name + ':' + val + '|g' + (incr ? '|' + incr : '');
   var buf = new Buffer(str);
 
   this.send(buf);
