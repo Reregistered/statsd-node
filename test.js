@@ -4,7 +4,7 @@ var params = {
   tunnel:{
     type:'redis',
     port:'6379',
-    host:'localhost'
+    host:'getteamup.com'
   }
 };
 
