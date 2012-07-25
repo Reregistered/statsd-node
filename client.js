@@ -8,15 +8,26 @@ var Client = function(params){
 
   params = params || {};
 
+
+
   this.port = params.port || '8125';
   this.host = params.host || 'localhost';
 
   ////////////////////////////////////////
-  // create a new class with a UDP connection
-  this.client = dgram.createSocket("udp4");
+  // check if we'll use a tunnel...
+  if (params.tunnel){
+
+    this.send = tunnel(params.tunnel);
+
+  }else{
+
+    ////////////////////////////////////////
+    // create a new class with a UDP connection
+    this.client = dgram.createSocket("udp4");
+  }
+
 
   //return this;
-
 }
 
 
@@ -56,3 +67,19 @@ Client.prototype.send = function(buf){
 exports = module.exports = function(params){
   return new Client(params);
 };
+
+function tunnel(params){
+
+  // we currently only support redis tunneling
+  if (params.type != 'redis'){
+    throw('We only support redis tunnels')
+  }
+
+  Redis   = require('redis');
+  var db = Redis.createClient(params.port, params.host, params.options);
+
+  return function(buf){
+    db.rpush(['statsd-tunnel', buf]);
+  }
+
+}

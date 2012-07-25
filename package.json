@@ -9,6 +9,7 @@
 	  }
   , "author": "Dov Amihod "
   , "dependencies": {
+    "redis":"0.7.2"
   }
   , "main": "client"
   , "engines": { "node": ">= 0.4.0 < 0.7.0" }
