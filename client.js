@@ -125,7 +125,6 @@ StatObj.prototype.addGauge = function(name,startVal, bStatic){
     // replace the setter, but keep the rest the same
     this.__defineSetter__(name, function(newval){
 
-      console.log('new val ' + newval);
       if (val != newval){
         var dir = val > newval ? 'decr' : 'incr';
         var iters = Math.abs(newval-val);
