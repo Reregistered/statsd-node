@@ -1,7 +1,9 @@
 /*
  */
 
-var dgram = require('dgram');
+var dgram   = require('dgram')
+  , util    = require('util')
+  , events  = require('events');
 
 
 var Client = function(params){
@@ -70,6 +72,8 @@ var StatObj = function(params){
     return;
   }
 
+  events.EventEmitter.call(this);
+
   this.stats  = params.client;
 
   this.gauges = {};
@@ -79,7 +83,6 @@ var StatObj = function(params){
   //return this;
   var me = this;
   var cleanup = function(val){
-    console.log('cleaning up stats object');
     removeExitEvents();
     // try and reset all gauges to 0
     for(var itr in me.gauges){
@@ -101,6 +104,8 @@ var StatObj = function(params){
   }
 };
 
+util.inherits(StatObj, events.EventEmitter);
+
 ////////////////////////////////////////////
 // Adds a gauge value. Initialises the gauge 
 // to 0
@@ -109,6 +114,10 @@ StatObj.prototype.addGauge = function(name,startVal, bStatic){
   // create a getter/setter for the name
   // Example of an object property added with defineProperty with a data property descriptor
   var val =  startVal? startVal: 0;
+  var fullName = this.stats.prefix + name;
+
+  this.emit('change', {name:fullName, value:val});
+
   Object.defineProperty(this, name,
     {enumerable : true,
      configurable : true,
@@ -117,6 +126,8 @@ StatObj.prototype.addGauge = function(name,startVal, bStatic){
       if (val != newval){
         val = newval;
         this.stats.gauge(name,val);
+
+        this.emit('change', {name:fullName, value:newval});
       }}
     }
   );
@@ -132,6 +143,7 @@ StatObj.prototype.addGauge = function(name,startVal, bStatic){
           this.stats.gauge(name,1,dir);
         }
         val = newval;
+        this.emit('change', {name:fullName, value:newval});
       }
     });
   }
@@ -160,6 +172,7 @@ StatObj.prototype.addCount = function(name){
         if (val != newval){
           val = newval;
           me.stats.count(name,val);
+          this.emit('change', {name:name, value:newval});
         }}
     }
   );
@@ -168,6 +181,8 @@ StatObj.prototype.addCount = function(name){
   this.count[name] = 1;
 
 };
+
+
 
 StatObj.prototype.getTimer = function(name,val, incr){
 
@@ -182,6 +197,7 @@ StatObj.prototype.getTimer = function(name,val, incr){
   timer.stop = function(){
     timer.value = (new Date()).getTime() - timer.starttime;
     me.stats.timing(name,timer.value);
+    this.emit('change', {name:name, value:timer.value});
   };
 
   return timer;
