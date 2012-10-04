@@ -168,25 +168,11 @@ StatObj.prototype.removeGauge = function(name){
   }
 };
 
-StatObj.prototype.addCount = function(name){
+StatObj.prototype.count = function(name,val){
 
-  var val = 0;
-  var me = this;
-  Object.defineProperty(this, name,
-    {enumerable : true,
-      configurable : true,
-      get : function(){ return val;},
-      set : function(newval){
-        if (val != newval){
-          val = newval;
-          me.stats.count(name,val);
-          this.emit('change', {name:name, value:newval});
-        }}
-    }
-  );
-
-  // just keep track of the gauges we have for clean up later
-  this.count[name] = 1;
+  val = val || 1;
+  this.stats.count(name,val);
+  this.emit('change', {name:name, value:val});
 
 };
 
@@ -205,7 +191,7 @@ StatObj.prototype.getTimer = function(name){
   timer.stop = function(){
     timer.value = (new Date()).getTime() - timer.starttime;
     me.stats.timing(name,timer.value);
-    this.emit('change', {name:name, value:timer.value});
+    me.emit('change', {name:name, value:timer.value});
   };
 
   return timer;
