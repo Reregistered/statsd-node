@@ -82,25 +82,33 @@ var StatObj = function(params){
 
   //return this;
   var me = this;
-  var cleanup = function(val){
+  var cleanup = function(val,dontExit){
     removeExitEvents();
     // try and reset all gauges to 0
     for(var itr in me.gauges){
       me.stats.gauge(itr,0);
     }
-    setTimeout(function(){process.exit()},500);
+    if (!dontExit){
+      setTimeout(function(){process.exit(val)},500);
+    }
+
+  };
+
+  var errorCleanUp = function(err){
+    cleanup(1, true);
+    throw err;
   };
 
   addExitEvents();
 
   function addExitEvents(){
     process.on('exit',cleanup);
-    process.on('uncaughtException', cleanup);
+    process.on('uncaughtException', errorCleanUp);
   }
 
   function removeExitEvents(){
     process.removeListener('exit',cleanup);
-    process.removeListener('uncaughtException',cleanup);
+    process.removeListener('uncaughtException',errorCleanUp);
   }
 };
 
@@ -184,7 +192,7 @@ StatObj.prototype.addCount = function(name){
 
 
 
-StatObj.prototype.getTimer = function(name,val, incr){
+StatObj.prototype.getTimer = function(name){
 
   var me = this;
   var timer = {};
