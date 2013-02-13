@@ -88,26 +88,19 @@ var StatObj = function(params){
     for(var itr in me.gauges){
       me.stats.gauge(itr,0);
     }
-    if (!dontExit){
-      setTimeout(function(){process.exit(val)},500);
-    }
-
   };
 
   var errorCleanUp = function(err){
     cleanup(1, true);
-    throw err;
   };
 
   addExitEvents();
 
   function addExitEvents(){
-    process.on('exit',cleanup);
     process.on('uncaughtException', errorCleanUp);
   }
 
   function removeExitEvents(){
-    process.removeListener('exit',cleanup);
     process.removeListener('uncaughtException',errorCleanUp);
   }
 };
