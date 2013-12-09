@@ -21,11 +21,6 @@ var Client = function(params){
 
     this.send = tunnel(params.tunnel);
 
-  }else{
-
-    ////////////////////////////////////////
-    // create a new class with a UDP connection
-    this.client = dgram.createSocket("udp4");
   }
 
   //return this;
@@ -60,9 +55,10 @@ Client.prototype.gauge = function(name,val, incr){
 };
 
 Client.prototype.send = function(buf){
-
-  this.client.send(buf, 0, buf.length, this.port, this.host);
-
+  var client = dgram.createSocket("udp4");
+  client.send(buf, 0, buf.length, this.port, this.host, function(err, bytes){
+    client.close();
+  });
 };
 
 var StatObj = function(params){
