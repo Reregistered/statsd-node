@@ -68,6 +68,8 @@ var StatObj = function(params){
     return;
   }
 
+  var that = this;
+
   events.EventEmitter.call(this);
 
   this.stats  = params.client;
@@ -78,7 +80,7 @@ var StatObj = function(params){
 
   //return this;
   var me = this;
-  var cleanup = function(val,dontExit){
+  this.cleanup = function(val,dontExit){
     removeExitEvents();
     // try and reset all gauges to 0
     for(var itr in me.gauges){
@@ -87,7 +89,7 @@ var StatObj = function(params){
   };
 
   var errorCleanUp = function(err){
-    cleanup(1, true);
+    that.cleanup(1, true);
   };
 
   addExitEvents();
