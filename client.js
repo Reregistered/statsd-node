@@ -77,30 +77,6 @@ var StatObj = function(params){
   this.gauges = {};
   this.counts = {};
   this.timers = {};
-
-  //return this;
-  var me = this;
-  this.cleanup = function(val,dontExit){
-    removeExitEvents();
-    // try and reset all gauges to 0
-    for(var itr in me.gauges){
-      me.stats.gauge(itr,0);
-    }
-  };
-
-  var errorCleanUp = function(err){
-    that.cleanup(1, true);
-  };
-
-  addExitEvents();
-
-  function addExitEvents(){
-    process.on('uncaughtException', errorCleanUp);
-  }
-
-  function removeExitEvents(){
-    process.removeListener('uncaughtException',errorCleanUp);
-  }
 };
 
 util.inherits(StatObj, events.EventEmitter);
