@@ -18,13 +18,13 @@ var Client = function(params){
   ////////////////////////////////////////
   // check if we'll use a tunnel...
   if (params.tunnel){
-
     this.send = tunnel(params.tunnel);
-
   }
 
-  //return this;
-}
+  // TODO: have a module level pool.
+  this.client = dgram.createSocket("udp4");
+
+};
 
 
 Client.prototype.count = function(name, count, interval){
@@ -45,26 +45,27 @@ Client.prototype.timing = function(name, timing){
 
 };
 
-Client.prototype.gauge = function(name,val, incr){
+Client.prototype.gauge = function(name,val, incr, cb){
 
   var str = this.prefix + name + ':' + val + '|g' + (incr ? '|' + incr : '');
   var buf = new Buffer(str);
 
-  this.send(buf);
+  this.send(buf, cb);
 
 };
 
-Client.prototype.send = function(buf){
-  var client = dgram.createSocket("udp4");
-  client.send(buf, 0, buf.length, this.port, this.host, function(err, bytes){
-    client.close();
+Client.prototype.send = function(buf, cb){
+  this.client.send(buf, 0, buf.length, this.port, this.host, function(err, bytes){
+    if (cb){
+      cb();
+    }
   });
 };
 
 var StatObj = function(params){
 
   if (!params){
-    throw "Need a client object"
+    throw "Need a client object";
     return;
   }
 
@@ -80,16 +81,34 @@ var StatObj = function(params){
 
   //return this;
   var me = this;
-  this.cleanup = function(val,dontExit){
+  this.cleanup = function(cb){
     removeExitEvents();
+
+    if (!Object.keys(me.gauges).length && cb) {
+      cb();
+      return;
+    }
+
+    var cbs = 0;
+    var localcb = function () {
+      if ((--cbs) === 0){
+        if (cb){
+          cb();
+        }
+      }
+    };
+
     // try and reset all gauges to 0
     for(var itr in me.gauges){
-      me.stats.gauge(itr,0);
+      cbs++;
+      me.stats.gauge(itr,0, localcb);
     }
   };
 
   var errorCleanUp = function(err){
-    that.cleanup(1, true);
+    that.cleanup(function(){
+      throw err;
+    });
   };
 
   addExitEvents();
