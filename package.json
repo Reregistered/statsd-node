@@ -1,6 +1,6 @@
 {
     "name": "statsd-node"
-  , "version": "0.2.2"
+  , "version": "0.2.3"
   , "description": "statsd node client"
   , "keywords": ["nodejs", "statsd","client"]
   , "repository" :
@@ -9,7 +9,7 @@
 	  }
   , "author": "Dov Amihod "
   , "dependencies": {
-    "redis":"0.7.2"
+      "redis":"0.10.3"
   }
   , "main": "client"
   , "engines": { "node": ">= 0.6.0 < 0.11.0" }

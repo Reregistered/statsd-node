@@ -5,6 +5,7 @@ var dgram   = require('dgram')
   , util    = require('util')
   , events  = require('events');
 
+var fn_null = function(){};
 
 var Client = function(params){
 
@@ -76,8 +77,6 @@ var StatObj = function(params){
   this.stats  = params.client;
 
   this.gauges = {};
-  this.counts = {};
-  this.timers = {};
 
   //return this;
   var me = this;
@@ -186,8 +185,6 @@ StatObj.prototype.count = function(name,val){
 
 };
 
-
-
 StatObj.prototype.getTimer = function(name){
 
   var me = this;
@@ -218,7 +215,7 @@ function tunnel(params){
   var db = Redis.createClient(params.port, params.host, params.options);
 
   return function(buf){
-    db.rpush(['statsd-tunnel', buf]);
+    db.rpush(['statsd-tunnel', buf], fn_null);
   }
 
 }
