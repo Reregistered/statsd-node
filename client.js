@@ -113,7 +113,30 @@ var StatObj = function(params){
   addExitEvents();
 
   function addExitEvents(){
-    process.on('uncaughtException', errorCleanUp);
+    /**
+     * tricky dicky: The typical way to register this event handler is
+     *     process.on('uncaughtException', errorCleanUp);
+     * so why don't we that?
+     *
+     * The statsd handler doesn't care about alerting the user or exiting
+     * the process. The handler is just concerned with cleaning up itself
+     * from the server.
+     *
+     * However, in general, there is no good way to tell if the user will be
+     * notified and the process will exit. The way default way this works that
+     * a default "uncaughtException" handler is injected at start time which
+     * handles that responbsability. The wrinkle here is that the default handler
+     * will only do that job if its the only handler. As handlers get executed in
+     * the order they are added ( in general) the default handler is executed,
+     * see that our handler is registered, and does nothing. Given that all
+     * of our options kind of suck, I felt the "best" way to get the behaviour
+     * we need is to hackishly insert our handler at the top of the heap, so we're
+     * executed first. During our execution we unregister ourselves so when
+     * the default handler triggers, it is the only handler.
+     */
+    // place our handler "first in line"
+    process.listeners('uncaughtException').unshift(errorCleanUp);
+
   }
 
   function removeExitEvents(){
